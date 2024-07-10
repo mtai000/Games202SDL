@@ -115,8 +115,11 @@ void Game::LoadData()
 	GetRenderer()->LoadObj("assets/obj/floor/floor.obj");
 	GetRenderer()->LoadObj("assets/obj/mary/Marry.obj");
 
-	FloorActor* _fa = new FloorActor(this);
-	MarryActor* _ma = new MarryActor(this);
+	FloorActor* _floor = new FloorActor(this);
+	MarryActor* _marry_big = new MarryActor(this);
+	MarryActor* _marry_small = new MarryActor(this);
+	_marry_small->SetPosition(glm::vec3(5.f, 0.f, 0.f));
+	_marry_small->SetScale(glm::vec3(5.f,5.f,5.f));
 }
 
 void Game::UnloadData()
