@@ -4,6 +4,10 @@
 #include "Actor/FloorActor.h"
 #include "Actor/CameraActor.h"
 #include <Actor/MarryActor.h>
+#include "Object/Light.h"
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <Actor/LightActor.h>
 Game::Game()
 	:mRenderer(nullptr)
 	, mIsRunning(true)
@@ -112,14 +116,40 @@ void Game::UpdateGame()
 
 void Game::LoadData()
 {
-	GetRenderer()->LoadObj("assets/hw0/obj/floor/floor.obj");
-	GetRenderer()->LoadObj("assets/hw0/obj/mary/Marry.obj");
+	GetRenderer()->LoadObj("assets/hw1/obj/floor/floor.obj");
+	GetRenderer()->LoadObj("assets/hw1/obj/mary/Marry.obj");
 
 	FloorActor* _floor = new FloorActor(this);
 	MarryActor* _marry_big = new MarryActor(this);
 	MarryActor* _marry_small = new MarryActor(this);
 	_marry_small->SetPosition(glm::vec3(5.f, 0.f, 0.f));
-	_marry_small->SetScale(glm::vec3(5.f,5.f,5.f));
+	_marry_small->SetScale(glm::vec3(5.f, 5.f, 5.f));
+
+	/*LightActor* light1 = new LightActor(this);*/
+	
+
+
+	DirectionLight* _dl = new DirectionLight(GetRenderer());
+	_dl->mPosition = glm::vec3(-50.f, 50.f, 0.f);
+	_dl->SetTargetAndUp(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+	_dl->mIntensity = glm::vec3(100.f, 100.f, 100.f);
+	GetRenderer()->AddLight(_dl);
+	GetRenderer()->AddFrameBuffer(2048, 2048);
+
+
+	DirectionLight* _dl2 = new DirectionLight(GetRenderer());
+	_dl2->mPosition = glm::vec3(50.f, 45.f, 0.f);
+	_dl2->SetTargetAndUp(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+	_dl2->mIntensity = glm::vec3(100.f,100.f, 100.f);
+	GetRenderer()->AddLight(_dl2);
+	GetRenderer()->AddFrameBuffer(2048, 2048);
+
+	DirectionLight* _dl3 = new DirectionLight(GetRenderer());
+	_dl3->mPosition = glm::vec3(0.f, 40.f, 50.f);
+	_dl3->SetTargetAndUp(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+	_dl3->mIntensity = glm::vec3(100.f, 100.f, 100.f);
+	GetRenderer()->AddLight(_dl3);
+	GetRenderer()->AddFrameBuffer(2048, 2048);
 }
 
 void Game::UnloadData()
@@ -137,17 +167,20 @@ void Game::UnloadData()
 
 void Game::ProcessInput()
 {
+	GetRenderer()->GetMainCamera()->Forward(0);
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
 		case SDL_QUIT:
 			mGameState = EQuit;
 			break;
-
+		case SDL_MOUSEWHEEL:
+			GetRenderer()->GetMainCamera()->Forward(event.wheel.y);
 		default:
 			break;
 		}
 	}
+
 	const Uint8* state = SDL_GetKeyboardState(NULL);
 	if (mGameState == EGameplay) {
 		for (auto actor : mActors) {

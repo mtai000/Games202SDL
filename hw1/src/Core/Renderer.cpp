@@ -14,6 +14,7 @@
 #include <SOIL/SOIL.h>
 #include "Actor/CameraActor.h"
 #include "Object/Light.h"
+#include "Shader/FrameBuffer.h"
 //#define TEST
 
 Renderer::Renderer(Game* game)
@@ -80,11 +81,6 @@ bool Renderer::Init(unsigned int width, unsigned int height)
 #endif
 	mMainCameraActor = new CameraActor(mGame);
 
-	DirectionLight* _dl = new DirectionLight(this);
-	_dl->mPosition = glm::vec3(20.f, 20.f, 20.f);
-	_dl->SetTargetAndUp(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
-	mDirLights.emplace_back(_dl);
-
 	return true;
 }
 
@@ -92,6 +88,17 @@ void Renderer::Shutdown()
 {
 	mPhongShader->Unload();
 	delete mPhongShader;
+
+	mLightShader->Unload();
+	delete mLightShader;
+
+	mShadowShader->Unload();
+	delete mShadowShader;
+
+	mTestShader->Unload();
+	delete mTestShader;
+
+	delete mTestVA;
 
 	SDL_GL_DeleteContext(mContext);
 	SDL_DestroyWindow(mWindow);
@@ -187,20 +194,29 @@ void Renderer::RemoveMeshComp(MeshComponent* mesh)
 	mMeshComps.erase(iter);
 }
 
-void Renderer::AddLight()
+void Renderer::AddLight(DirectionLight* light)
 {
+	mDirLights.emplace_back(light);
 }
 
 void Renderer::Draw()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_DEPTH_TEST);
+
 
 #ifdef TEST
 	TestRendering();
 #endif
 	//LightRendering();
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+	glViewport(0.0, 0.0, 2048, 2048);
+	ShadowRendering();
+
+	glViewport(0, 0, mScreenWidth, mScreenHeight);
+	glClearColor(0.f, 0.f, 0.f, 1.0f);
 	PhongRendering();
+	
+
 	SDL_GL_SwapWindow(mWindow);
 }
 
@@ -219,25 +235,57 @@ void Renderer::LightRendering()
 	}
 }
 
+void Renderer::ShadowRendering()
+{
+	mShadowShader->SetActive();
+	mShadowShader->SetMat4("uViewMatrix", mMainCameraActor->GetViewMatrix());
+	mShadowShader->SetMat4("uProjectionMatrix", mMainCameraActor->GetProjMatrix());
+
+	for (int i = 0; i < mDirLights.size(); i++)
+	{
+		//mShadowShader->SetVec3("uLightPos", mDirLights[i]->mPosition);
+		mFrameBuffer[i]->Active();
+		glClearColor(1.f, 1.f, 1.f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		for (auto m : mMeshComps)
+		{
+			//auto a = mDirLights[i]->GetMVP(m->GetOwner()) * glm::vec4(0.f, 0.f, 0.f, 1.f);
+			mShadowShader->SetMat4("uModelMatrix", m->GetOwner()->GetWorldTransform());
+			mShadowShader->SetMat4("uLightMVP", mDirLights[i]->GetMVP(m->GetOwner()));
+			m->Draw(mShadowShader);
+		}
+		mFrameBuffer[i]->Disactive();
+	}
+}
+
 void Renderer::PhongRendering()
 {
 	mPhongShader->SetActive();
 	mPhongShader->SetMat4("uViewMatrix", mMainCameraActor->GetViewMatrix());
 	mPhongShader->SetMat4("uProjectionMatrix", mMainCameraActor->GetProjMatrix());
 
-	for (auto light : mDirLights)
+	for (int i = 0; i < mDirLights.size(); i++)
 	{
-		//mPhongShader->SetMat4("uLightMVP", light->GetMVP());
+		if (i != 0)
+		{
+			glDepthFunc(GL_LEQUAL);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_ONE, GL_ONE);
+		}
+
 		for (auto m : mMeshComps) {
 			if (m->GetVisible())
 			{
+				mPhongShader->SetMat4("uModelMatrix", m->GetOwner()->GetWorldTransform());
+				mPhongShader->SetMat4("uLightMVP", mDirLights[i]->GetMVP(m->GetOwner()));
+			
 				auto _material = m->GetMaterial();
 				mPhongShader->SetVec3("uKd", _material->mKd);
 				mPhongShader->SetVec3("uKs", _material->mKs);
-				mPhongShader->SetVec3("uLightPos", light->mPosition);
-				mPhongShader->SetVec3("uCameraPos", mMainCameraActor->GetPosition());
+				mPhongShader->SetVec3("uLightPos", mDirLights[i]->mPosition);
 
-				mPhongShader->SetFloat("uLightIntensity", light->mIntensity);
+				mPhongShader->SetVec3("uCameraPos", mMainCameraActor->GetPosition());
+				mPhongShader->SetVec3("uLightIntensity", mDirLights[i]->mIntensity);
 
 				if (m->GetTexture())
 				{
@@ -248,10 +296,15 @@ void Renderer::PhongRendering()
 				{
 					mPhongShader->SetInt("uTextureSample", 0);
 				}
+
+				mPhongShader->SetShadowMap("uShadowMap", mFrameBuffer[i]->colorAttachment);
+				
 				m->Draw(mPhongShader);
+				mPhongShader->ResetTextureID();
 			}
 		}
 	}
+	glDisable(GL_BLEND);
 }
 
 void Renderer::TestRendering() {
@@ -281,27 +334,39 @@ bool Renderer::LoadShaders() {
 	}
 #endif //  Test
 
-	mLightShader = new Shader();
-	if (!mLightShader->Load("assets/hw0/shader/light.vert", "assets/hw0/shader/light.frag"))
-	{
-		return false;
-	}
+	//mLightShader = new Shader();
+	//if (!mLightShader->Load("assets/hw1/shader/light.vert", "assets/hw1/shader/light.frag"))
+	//{
+	//	return false;
+	//}
 
 	mPhongShader = new Shader();
-	if (!mPhongShader->Load("assets/hw0/shader/phong.vert", "assets/hw0/shader/phong.frag"))
+	if (!mPhongShader->Load("assets/hw1/shader/phong.vert", "assets/hw1/shader/phong.frag"))
 	{
 		return false;
 	}
 	////mPhongShader->SetActive();
 
-	//mShadowShader = new Shader();
-	//if (!mShadowShader->Load("assets/shader/shadow.vert", "assets/shader/shadow.frag"))
-	//{
-	//	return false;
-	//}
+	mShadowShader = new Shader();
+	if (!mShadowShader->Load("assets/hw1/shader/shadow.vert", "assets/hw1/shader/shadow.frag"))
+	{
+		return false;
+	}
 	//mPhongShader->SetActive();
 
 	return true;
+}
+
+unsigned int Renderer::AddFrameBuffer(unsigned int width, unsigned int height)
+{
+	FrameBuffer* fb = new FrameBuffer(width, height);
+	return AddFrameBuffer(fb);
+}
+
+unsigned int Renderer::AddFrameBuffer(FrameBuffer* _fbo)
+{
+	mFrameBuffer.push_back(_fbo);
+	return mFrameBuffer.size() - 1;
 }
 
 bool Renderer::LoadObj(const char* filePath) {

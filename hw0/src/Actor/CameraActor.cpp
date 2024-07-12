@@ -11,7 +11,7 @@ CameraActor::CameraActor(Game* _game)
 {
 	mMoveComp = new MoveComponent(this);
 	SetPosition(glm::vec3(20.f, 50.f, 50.f));
-	mFov = 70.f;
+	mFov = 60.f;
 	LookAt(glm::vec3(0.f));
 }
 
