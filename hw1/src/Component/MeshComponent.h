@@ -10,6 +10,8 @@ public:
 	void SetVisible(bool visible) { mVisible = visible; }
 	bool GetVisible() const { return mVisible; }
 
+	void GenCube();
+
 	void SetMesh(class Mesh* mesh) { mMesh = mesh; }
 	class Mesh* GetMesh() const { return mMesh; }
 

@@ -4,7 +4,7 @@
 #include "Actor/FloorActor.h"
 #include "Actor/CameraActor.h"
 #include <Actor/MarryActor.h>
-#include "Object/Light.h"
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <Actor/LightActor.h>
@@ -119,37 +119,36 @@ void Game::LoadData()
 	GetRenderer()->LoadObj("assets/hw1/obj/floor/floor.obj");
 	GetRenderer()->LoadObj("assets/hw1/obj/mary/Marry.obj");
 
-	FloorActor* _floor = new FloorActor(this);
-	MarryActor* _marry_big = new MarryActor(this);
-	MarryActor* _marry_small = new MarryActor(this);
-	_marry_small->SetPosition(glm::vec3(5.f, 0.f, 0.f));
-	_marry_small->SetScale(glm::vec3(5.f, 5.f, 5.f));
+	Actor* a = new FloorActor(this);
+	a->SetScale(glm::vec3(4.f, 4.f, 4.f));
 
-	/*LightActor* light1 = new LightActor(this);*/
-	
+	a = new MarryActor(this);
+	a->SetPosition(glm::vec3(0.f, 0.f, 0.f));
+	a->SetScale(glm::vec3(10.f, 10.f, 10.f));
 
-
-	DirectionLight* _dl = new DirectionLight(GetRenderer());
-	_dl->mPosition = glm::vec3(-50.f, 50.f, 0.f);
-	_dl->SetTargetAndUp(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
-	_dl->mIntensity = glm::vec3(100.f, 100.f, 100.f);
-	GetRenderer()->AddLight(_dl);
-	GetRenderer()->AddFrameBuffer(2048, 2048);
+	a = new MarryActor(this);
+	a->SetPosition(glm::vec3(5.f, 0.f, 0.f));
+	a->SetScale(glm::vec3(5.f, 5.f, 5.f));
 
 
-	DirectionLight* _dl2 = new DirectionLight(GetRenderer());
-	_dl2->mPosition = glm::vec3(50.f, 45.f, 0.f);
-	_dl2->SetTargetAndUp(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
-	_dl2->mIntensity = glm::vec3(100.f,100.f, 100.f);
-	GetRenderer()->AddLight(_dl2);
-	GetRenderer()->AddFrameBuffer(2048, 2048);
+	LightActor* l = new LightActor(this, glm::vec3(30.f, 40.f, 0.f));
+	l->SetRotateSpeed(glm::radians(10.f));
+	l->InitFrameBuffer(2048, 2048);
 
-	DirectionLight* _dl3 = new DirectionLight(GetRenderer());
-	_dl3->mPosition = glm::vec3(0.f, 40.f, 50.f);
-	_dl3->SetTargetAndUp(glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
-	_dl3->mIntensity = glm::vec3(100.f, 100.f, 100.f);
-	GetRenderer()->AddLight(_dl3);
-	GetRenderer()->AddFrameBuffer(2048, 2048);
+	l = new LightActor(this, glm::vec3(40.f, 35.f, 0.f));
+	l->SetRotateSpeed(glm::radians(20.f));
+	l->InitFrameBuffer(2048, 2048);
+
+	l = new LightActor(this, glm::vec3(50.f, 30.f, 0.f));
+	l->SetRotateSpeed(glm::radians(30.f));
+	l->InitFrameBuffer(2048, 2048);
+
+
+	a = nullptr;
+	delete a;
+
+	l = nullptr;
+	delete l;
 }
 
 void Game::UnloadData()

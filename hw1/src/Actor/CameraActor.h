@@ -15,8 +15,8 @@ public:
 	void Forward(int);
 	void UpdateActor(float deltaTime);
 	bool mReCompute;
+
 private:
-	class CameraControlComponent* mCamCtrl;
 	glm::mat4 mView;
 	glm::mat4 mProj;
 

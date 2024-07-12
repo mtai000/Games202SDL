@@ -1,6 +1,7 @@
 #pragma once
 #include "Core/Component.h"
 #include <glm/glm.hpp>
+#include "MyMath.h"
 
 class LightComponent : public Component {
 public:
@@ -13,10 +14,12 @@ public:
 	void SetIntensity(glm::vec3 _i) { mIntensity = _i; }
 	glm::vec3 GetIntensity() const { return mIntensity; }
 
-	void SetTargetAndUp(const glm::vec3& _target, const glm::vec3& _up);
+	void SetTargetAndUp(const glm::vec3& _target = glm::vec3(0.f, 0.f, 0.f), const glm::vec3& _up = MyMath::AxisY);
 	glm::mat4 GetMVP(class Actor* targetObject);
 
 	void Update(float deltaTime);
+
+	void SetSpeed(float _v) { mSpeed = _v; }
 
 private:
 	glm::vec3 mColor;

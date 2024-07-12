@@ -22,6 +22,10 @@ MeshComponent::~MeshComponent()
 	GetOwner()->GetGame()->GetRenderer()->RemoveMeshComp(this);
 }
 
+void MeshComponent::GenCube()
+{
+}
+
 void MeshComponent::Draw(Shader* meshShader)
 {
 	if (mMesh) {

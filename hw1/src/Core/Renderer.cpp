@@ -2,7 +2,7 @@
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include "Game.h"
-#include "Component/MeshComponent.h"
+
 #include "Shader/Shader.h"
 #include <iostream>
 #include "Core/Renderer.h"
@@ -13,8 +13,10 @@
 #include <Shader/VertexArray.h>
 #include <SOIL/SOIL.h>
 #include "Actor/CameraActor.h"
-#include "Object/Light.h"
-#include "Shader/FrameBuffer.h"
+
+#include "Component/LightComponent.h"
+#include "Component/MeshComponent.h"
+#include "Component/FrameBufferComponent.h"
 //#define TEST
 
 Renderer::Renderer(Game* game)
@@ -194,9 +196,23 @@ void Renderer::RemoveMeshComp(MeshComponent* mesh)
 	mMeshComps.erase(iter);
 }
 
-void Renderer::AddLight(DirectionLight* light)
+void Renderer::AddFrameBufferComp(FrameBufferComponent* fbo)
 {
-	mDirLights.emplace_back(light);
+	mFrameBufferComps.emplace_back(fbo);
+}
+
+void Renderer::RemoveFrameBufferComp(FrameBufferComponent* fbo)
+{
+	auto iter = std::find(mFrameBufferComps.begin(), mFrameBufferComps.end(), fbo);
+	mFrameBufferComps.erase(iter);
+}
+
+void Renderer::AddLightComp(LightComponent* light) {
+	mLightComps.emplace_back(light);
+}
+void Renderer::RemoveLightComp(LightComponent* light) {
+	auto iter = std::find(mLightComps.begin(), mLightComps.end(), light);
+	mLightComps.erase(iter);
 }
 
 void Renderer::Draw()
@@ -215,7 +231,7 @@ void Renderer::Draw()
 	glViewport(0, 0, mScreenWidth, mScreenHeight);
 	glClearColor(0.f, 0.f, 0.f, 1.0f);
 	PhongRendering();
-	
+
 
 	SDL_GL_SwapWindow(mWindow);
 }
@@ -241,20 +257,18 @@ void Renderer::ShadowRendering()
 	mShadowShader->SetMat4("uViewMatrix", mMainCameraActor->GetViewMatrix());
 	mShadowShader->SetMat4("uProjectionMatrix", mMainCameraActor->GetProjMatrix());
 
-	for (int i = 0; i < mDirLights.size(); i++)
+	for (int i = 0; i < mLightComps.size(); i++)
 	{
-		//mShadowShader->SetVec3("uLightPos", mDirLights[i]->mPosition);
-		mFrameBuffer[i]->Active();
+		mFrameBufferComps[i]->Active();
 		glClearColor(1.f, 1.f, 1.f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		for (auto m : mMeshComps)
 		{
-			//auto a = mDirLights[i]->GetMVP(m->GetOwner()) * glm::vec4(0.f, 0.f, 0.f, 1.f);
 			mShadowShader->SetMat4("uModelMatrix", m->GetOwner()->GetWorldTransform());
-			mShadowShader->SetMat4("uLightMVP", mDirLights[i]->GetMVP(m->GetOwner()));
+			mShadowShader->SetMat4("uLightMVP", mLightComps[i]->GetMVP(m->GetOwner()));
 			m->Draw(mShadowShader);
 		}
-		mFrameBuffer[i]->Disactive();
+		mFrameBufferComps[i]->Disactive();
 	}
 }
 
@@ -264,7 +278,7 @@ void Renderer::PhongRendering()
 	mPhongShader->SetMat4("uViewMatrix", mMainCameraActor->GetViewMatrix());
 	mPhongShader->SetMat4("uProjectionMatrix", mMainCameraActor->GetProjMatrix());
 
-	for (int i = 0; i < mDirLights.size(); i++)
+	for (int i = 0; i < mLightComps.size(); i++)
 	{
 		if (i != 0)
 		{
@@ -277,15 +291,15 @@ void Renderer::PhongRendering()
 			if (m->GetVisible())
 			{
 				mPhongShader->SetMat4("uModelMatrix", m->GetOwner()->GetWorldTransform());
-				mPhongShader->SetMat4("uLightMVP", mDirLights[i]->GetMVP(m->GetOwner()));
-			
+				mPhongShader->SetMat4("uLightMVP", mLightComps[i]->GetMVP(m->GetOwner()));
+
 				auto _material = m->GetMaterial();
 				mPhongShader->SetVec3("uKd", _material->mKd);
 				mPhongShader->SetVec3("uKs", _material->mKs);
-				mPhongShader->SetVec3("uLightPos", mDirLights[i]->mPosition);
+				mPhongShader->SetVec3("uLightPos", mLightComps[i]->GetOwner()->GetPosition());
 
 				mPhongShader->SetVec3("uCameraPos", mMainCameraActor->GetPosition());
-				mPhongShader->SetVec3("uLightIntensity", mDirLights[i]->mIntensity);
+				mPhongShader->SetVec3("uLightIntensity", mLightComps[i]->GetIntensity());
 
 				if (m->GetTexture())
 				{
@@ -297,8 +311,8 @@ void Renderer::PhongRendering()
 					mPhongShader->SetInt("uTextureSample", 0);
 				}
 
-				mPhongShader->SetShadowMap("uShadowMap", mFrameBuffer[i]->colorAttachment);
-				
+				mPhongShader->SetShadowMap("uShadowMap", mFrameBufferComps[i]->GetColorTexture());
+
 				m->Draw(mPhongShader);
 				mPhongShader->ResetTextureID();
 			}
@@ -355,18 +369,6 @@ bool Renderer::LoadShaders() {
 	//mPhongShader->SetActive();
 
 	return true;
-}
-
-unsigned int Renderer::AddFrameBuffer(unsigned int width, unsigned int height)
-{
-	FrameBuffer* fb = new FrameBuffer(width, height);
-	return AddFrameBuffer(fb);
-}
-
-unsigned int Renderer::AddFrameBuffer(FrameBuffer* _fbo)
-{
-	mFrameBuffer.push_back(_fbo);
-	return mFrameBuffer.size() - 1;
 }
 
 bool Renderer::LoadObj(const char* filePath) {

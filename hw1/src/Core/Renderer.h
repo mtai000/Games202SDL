@@ -26,10 +26,15 @@ public:
 	void AddMeshComp(class MeshComponent* mesh);
 	void RemoveMeshComp(class MeshComponent* mesh);
 
+	void AddFrameBufferComp(class FrameBufferComponent* fbo);
+	void RemoveFrameBufferComp(class FrameBufferComponent* fbo);
+
+	void AddLightComp(class LightComponent* light);
+	void RemoveLightComp(class LightComponent* light);
+
 	float GetScreenWidth() const { return mScreenWidth; }
 	float GetScreenHeight() const { return mScreenHeight; }
 
-	void AddLight(class DirectionLight* light);
 	void Draw();
 
 	void LightRendering();
@@ -42,8 +47,7 @@ public:
 	bool LoadMaterial(const char* folder, const char* fileName);
 
 	class CameraActor* GetMainCamera() { return mMainCameraActor; }
-	unsigned int AddFrameBuffer(unsigned int width, unsigned int height);
-	unsigned int AddFrameBuffer(class FrameBuffer*);
+
 
 private:
 	bool LoadShaders();
@@ -57,12 +61,11 @@ private:
 	class Shader* mLightShader;
 	class Shader* mPhongShader;
 	class Shader* mShadowShader;
-	
-	std::vector<class FrameBuffer*> mFrameBuffer;
+
 
 	std::vector<class MeshComponent*> mMeshComps;
-	std::vector<class DirectionLight*> mDirLights;
-	//std::vector<class LightComponent*> mDirLights;
+	std::vector<class FrameBufferComponent*> mFrameBufferComps;
+	std::vector<class LightComponent*> mLightComps;
 
 	std::unordered_map<std::string, class Mesh*> mMeshes;
 	std::unordered_map<std::string, class Material*> mMateriales;

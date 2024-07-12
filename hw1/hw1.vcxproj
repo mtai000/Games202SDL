@@ -87,11 +87,9 @@
     <ClCompile Include="src\Core\Game.cpp" />
     <ClCompile Include="src\Core\Renderer.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Object\Light.cpp" />
     <ClCompile Include="src\Object\Material.cpp" />
     <ClCompile Include="src\Object\Mesh.cpp" />
     <ClCompile Include="src\Object\Texture.cpp" />
-    <ClCompile Include="src\Shader\FrameBuffer.cpp" />
     <ClCompile Include="src\Shader\Shader.cpp" />
     <ClCompile Include="src\Shader\VertexArray.cpp" />
   </ItemGroup>
@@ -109,12 +107,10 @@
     <ClInclude Include="src\Core\Game.h" />
     <ClInclude Include="src\Core\Renderer.h" />
     <ClInclude Include="src\MyMath.h" />
-    <ClInclude Include="src\Object\Light.h" />
     <ClInclude Include="src\Object\Material.h" />
     <ClInclude Include="src\Object\Mesh.h" />
     <ClInclude Include="src\Object\SVertex.h" />
     <ClInclude Include="src\Object\Texture.h" />
-    <ClInclude Include="src\Shader\FrameBuffer.h" />
     <ClInclude Include="src\Shader\Shader.h" />
     <ClInclude Include="src\Shader\VertexArray.h" />
   </ItemGroup>
