@@ -51,10 +51,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\admin\scoop\apps\vcpkg\2024.07.12\installed\x64-windows\include\SDL2;C:\Users\admin\scoop\apps\vcpkg\2024.07.12\installed\x64-windows\include;$(ProjectDir)src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Users\admin\scoop\apps\vcpkg\2024.07.12\installed\x64-windows\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;glew32.lib;glm.lib;OpenGL32.lib;soil.lib;sdl2.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -106,7 +109,7 @@
     <ClInclude Include="src\Core\Component.h" />
     <ClInclude Include="src\Core\Game.h" />
     <ClInclude Include="src\Core\Renderer.h" />
-    <ClInclude Include="src\MyMath.h" />
+    <ClInclude Include="src\head.h" />
     <ClInclude Include="src\Object\Material.h" />
     <ClInclude Include="src\Object\Mesh.h" />
     <ClInclude Include="src\Object\SVertex.h" />

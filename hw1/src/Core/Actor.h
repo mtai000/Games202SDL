@@ -1,7 +1,7 @@
 #pragma once
+#include "head.h"
 #include <cstdint>
 #include <glm/gtx/euler_angles.hpp>
-#include <glm/glm.hpp>
 #include <vector>
 
 class Actor {

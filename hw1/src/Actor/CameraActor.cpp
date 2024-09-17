@@ -2,7 +2,7 @@
 #include "Core/Actor.h"
 #include "Core/Game.h"
 #include "Core/Renderer.h"
-#include "MyMath.h"
+#include "head.h"
 #include "Component/MoveComponent.h"
 #include <glm/gtx/vector_angle.hpp>;
 #include <glm/gtc/constants.hpp>
@@ -25,11 +25,11 @@ CameraActor::~CameraActor()
 void CameraActor::LookAt(glm::vec3 _tar)
 {
 	glm::vec3 direction = glm::normalize(GetPosition() - _tar);
-	float angle = glm::angle(direction, (glm::vec3)MyMath::AxisY);
+	float angle = glm::angle(direction, (glm::vec3)mms::AxisY);
 
-	if (angle < MyMath::EPSILON)
+	if (angle < mms::EPSILON)
 		direction = glm::normalize(glm::vec3(0.f, 1.f, -0.1f));
-	auto side = glm::normalize(glm::cross(-direction, MyMath::AxisY));
+	auto side = glm::normalize(glm::cross(-direction, mms::AxisY));
 	auto up = glm::normalize(glm::cross(side, -direction));
 
 	mView = glm::lookAt(GetPosition(), _tar, up);
@@ -107,7 +107,7 @@ void CameraActor::Forward(int _y)
 
 void CameraActor::UpdateActor(float deltaTime) {
 
-	if (abs(mForwadSpeed) > MyMath::EPSILON)
+	if (abs(mForwadSpeed) > mms::EPSILON)
 	{
 		mReCompute = true;
 		SetPosition(GetPosition() + mForward * mForwadSpeed * deltaTime);
@@ -115,13 +115,13 @@ void CameraActor::UpdateActor(float deltaTime) {
 
 	if (mAlwaysFocus)
 	{	
-		if (abs(mSideSpeed) > MyMath::EPSILON)
+		if (abs(mSideSpeed) > mms::EPSILON)
 		{
 			mReCompute = true;
-			auto newPos = glm::rotate(glm::mat4(1.f), glm::radians(mSideSpeed / 4 * deltaTime), MyMath::AxisY) * glm::vec4(GetPosition(), 1.0f);
+			auto newPos = glm::rotate(glm::mat4(1.f), glm::radians(mSideSpeed / 4 * deltaTime), mms::AxisY) * glm::vec4(GetPosition(), 1.0f);
 			SetPosition(glm::vec3(newPos.x, newPos.y, newPos.z));
 		}
-		if (abs(mUpSpeed) > MyMath::EPSILON)
+		if (abs(mUpSpeed) > mms::EPSILON)
 		{
 			mReCompute = true;
 			auto newPos = glm::rotate(glm::mat4(1.f), glm::radians(mUpSpeed / 4 * deltaTime), mSide) * glm::vec4(GetPosition(), 1.0f);
@@ -131,12 +131,12 @@ void CameraActor::UpdateActor(float deltaTime) {
 	}
 	else
 	{
-		if (abs(mSideSpeed) > MyMath::EPSILON)
+		if (abs(mSideSpeed) > mms::EPSILON)
 		{
 			mReCompute = true;
 			SetPosition(GetPosition() + mSide * mSideSpeed * deltaTime);
 		}
-		if (abs(mUpSpeed) > MyMath::EPSILON)
+		if (abs(mUpSpeed) > mms::EPSILON)
 		{
 			mReCompute = true;
 			SetPosition(GetPosition() + mUp * mUpSpeed * deltaTime);

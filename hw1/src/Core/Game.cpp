@@ -5,6 +5,7 @@
 #include "Actor/CameraActor.h"
 #include <Actor/MarryActor.h>
 
+#include <algorithm>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <Actor/LightActor.h>
@@ -12,6 +13,7 @@ Game::Game()
 	:mRenderer(nullptr)
 	, mIsRunning(true)
 	, mUpdatingActors(false)
+	, mGameState(EGameplay)
 {
 }
 
@@ -116,8 +118,8 @@ void Game::UpdateGame()
 
 void Game::LoadData()
 {
-	GetRenderer()->LoadObj("assets/hw1/obj/floor/floor.obj");
-	GetRenderer()->LoadObj("assets/hw1/obj/mary/Marry.obj");
+	GetRenderer()->LoadObj(std::string(mms::assets_path + "obj/floor/floor.obj").c_str());
+	GetRenderer()->LoadObj(std::string(mms::assets_path + "obj/mary/Marry.obj").c_str());
 
 	Actor* a = new FloorActor(this);
 	a->SetScale(glm::vec3(4.f, 4.f, 4.f));
@@ -158,7 +160,7 @@ void Game::UnloadData()
 		delete mActors.back();
 	}
 
-	while (mRenderer)
+	if(mRenderer)
 	{
 		mRenderer->UnloadData();
 	}

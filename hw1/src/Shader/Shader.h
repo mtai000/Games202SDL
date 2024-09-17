@@ -4,8 +4,7 @@
 #include <string>
 #include <fstream>
 #include <sstream>
-
-#include <glm/glm.hpp>
+#include "head.h"
 
 class Shader {
 public:

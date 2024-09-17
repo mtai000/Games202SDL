@@ -7,6 +7,8 @@
 
 LightActor::LightActor(Game* _game)
 	: Actor(_game)
+	, mMeshComp(NULL)
+	, mFrameBufferComp(NULL)
 {
 	SetPosition(glm::vec3(10.f, 10.f, 0.f));
 
@@ -20,6 +22,8 @@ LightActor::LightActor(Game* _game)
 
 LightActor::LightActor(Game* _game, glm::vec3 pos)
 	:Actor(_game)
+	, mMeshComp(NULL)
+	, mFrameBufferComp(NULL)
 {
 	SetPosition(pos);
 

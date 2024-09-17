@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <glm/glm.hpp>
+#include "head.h"
 #include "Texture.h"
 #include <vector>
 

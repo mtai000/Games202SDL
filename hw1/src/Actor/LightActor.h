@@ -1,7 +1,6 @@
 #pragma once
 #include <Core/Actor.h>
-
-#include <glm/glm.hpp>
+#include "head.h"
 class LightActor : public Actor {
 public:
 	LightActor(class Game* _game);

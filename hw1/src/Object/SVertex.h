@@ -1,5 +1,5 @@
 #pragma once
-#include <glm/glm.hpp>
+#include "head.h"
 
 struct SVertex {
 	glm::vec3 position;

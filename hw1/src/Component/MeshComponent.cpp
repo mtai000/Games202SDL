@@ -10,8 +10,9 @@
 
 MeshComponent::MeshComponent(Actor* owner)
 	:Component(owner)
-	, mMesh(nullptr)
-	, mMaterial(nullptr)
+	, mMesh(NULL)
+	, mMaterial(NULL)
+	, mTexture(NULL)
 	, mVisible(true)
 {
 	GetOwner()->GetGame()->GetRenderer()->AddMeshComp(this);

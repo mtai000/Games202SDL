@@ -30,6 +30,7 @@ bool Shader::Load(const std::string& vertex, const std::string& fragment) {
 }
 
 void Shader::Unload() {
+	if (!this) return;
 	glDeleteProgram(mProgram);
 	glDeleteShader(mVertex);
 	glDeleteShader(mFragment);

@@ -1,8 +1,7 @@
 #pragma once
-#include <SDL2/SDL.h>
+#include "head.h"
 #include <unordered_map>
 #include <string>
-#include <glm/glm.hpp>
 
 class Renderer {
 public:

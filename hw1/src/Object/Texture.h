@@ -10,7 +10,9 @@ public:
 
 	void FlipVertical(unsigned char* image, int widht, int height, int channels);
 
-	bool Load(const std::string& fileName);
+    unsigned char floatToByte(float value);
+
+    bool Load(const std::string& fileName);
 	void Unload();
 	void CreateFromSurface(struct SDL_Surface* surface);
 

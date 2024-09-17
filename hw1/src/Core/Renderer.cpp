@@ -11,7 +11,6 @@
 #include "Object/Material.h"
 #include "Object/Texture.h"
 #include <Shader/VertexArray.h>
-#include <SOIL/SOIL.h>
 #include "Actor/CameraActor.h"
 
 #include "Component/LightComponent.h"
@@ -23,9 +22,9 @@ Renderer::Renderer(Game* game)
 	: mGame(game)
 	, mScreenHeight(768)
 	, mScreenWidth(1024)
-	, mPhongShader(nullptr)
-	, mTestShader(nullptr)
-	, mShadowShader(nullptr)
+	, mPhongShader(NULL)
+	, mTestShader(NULL)
+	, mShadowShader(NULL)
 {
 
 }
@@ -102,6 +101,7 @@ void Renderer::Shutdown()
 
 	delete mTestVA;
 
+	printf("Shutdown Renderer\n");
 	SDL_GL_DeleteContext(mContext);
 	SDL_DestroyWindow(mWindow);
 }
@@ -125,6 +125,7 @@ void Renderer::UnloadData()
 		delete m.second;
 	}
 	mMeshes.clear();
+	printf("Unload Data\n");
 }
 
 void Renderer::AddMesh(Mesh* mesh)
@@ -348,21 +349,16 @@ bool Renderer::LoadShaders() {
 	}
 #endif //  Test
 
-	//mLightShader = new Shader();
-	//if (!mLightShader->Load("assets/hw1/shader/light.vert", "assets/hw1/shader/light.frag"))
-	//{
-	//	return false;
-	//}
 
 	mPhongShader = new Shader();
-	if (!mPhongShader->Load("assets/hw1/shader/phong.vert", "assets/hw1/shader/phong.frag"))
+	if (!mPhongShader->Load(std::string(mms::shaders_path + "phong.vert").c_str(), std::string(mms::shaders_path + "phong.frag").c_str()))
 	{
 		return false;
 	}
 	////mPhongShader->SetActive();
 
 	mShadowShader = new Shader();
-	if (!mShadowShader->Load("assets/hw1/shader/shadow.vert", "assets/hw1/shader/shadow.frag"))
+	if (!mShadowShader->Load(std::string(mms::shaders_path + "shadow.vert").c_str(), std::string(mms::shaders_path + "shadow.frag").c_str()))
 	{
 		return false;
 	}

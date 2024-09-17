@@ -1,0 +1,39 @@
+﻿cmake_minimum_required (VERSION 3.8)
+
+project ("Games202")
+
+set(LOCAL_3RDPARTY ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty)
+set(CMAKE_MODULE_PATH ${LOCAL_3RDPARTY}/CMake)
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:CONSOLE /NODEFAULTLIB:library")
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/lib")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")
+
+if(WIN32 AND "${CMAKE_GENERATOR}" MATCHES "^(Visual Studio).*")
+  set(MODULE_TARGET_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$(ConfigurationName)")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+else()
+  set(MODULE_TARGET_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+endif()
+
+include(${LOCAL_3RDPARTY}/cmake/CopyFiles.cmake)
+find_package(OpenGL REQUIRED)
+find_package(GLFW REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(GLM REQUIRED)
+include(3rdparty/SDL2/cmake/sdl2-config.cmake)
+
+message(${SDL2_INCLUDE_DIRS})
+include_directories(
+    ${GLEW_INCLUDE_DIRS}
+    ${GLFW_INCLUDE_DIR}
+    ${GLM_INCLUDE_DIR}
+    ${LOCAL_3RDPARTY}/stb_image
+    ${SDL2_INCLUDE_DIRS}
+)
+
+add_subdirectory ("hw1")

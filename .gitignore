@@ -1,0 +1,12 @@
+out
+build
+/temp
+3rdparty/downloads
+3rdparty/fastgltf
+3rdparty/glfw
+3rdparty/glew
+3rdparty/SDL2
+x64
+.vs
+.vsproj
+.vscode

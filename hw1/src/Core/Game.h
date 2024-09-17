@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include <SDL2/SDL.h>
+#include "head.h"
 
 class Game {
 public:
@@ -29,7 +29,7 @@ private:
 	class Renderer* mRenderer;
 
 	void UpdateGame();
-	void LoadData();
+	void LoadData ();
 	void UnloadData();
 
 	void ProcessInput();

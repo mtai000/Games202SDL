@@ -1,6 +1,6 @@
 #pragma once
 #include "Core/Actor.h"
-#include <glm/glm.hpp>
+#include "head.h"
 class CameraActor :public Actor {
 public:
 	CameraActor(class Game* _game);

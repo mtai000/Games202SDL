@@ -1,5 +1,5 @@
 #include "MoveComponent.h"
-#include <MyMath.h>
+#include "head.h"
 #include <Core/Actor.h>
 
 MoveComponent::MoveComponent(class Actor* owner, int updateOrder)
@@ -11,7 +11,7 @@ MoveComponent::MoveComponent(class Actor* owner, int updateOrder)
 
 void MoveComponent::Update(float deltaTime)
 {
-	if (MyMath::NearZero(mRotateSpeed)) {
+	if (mms::NearZero(mRotateSpeed)) {
 		glm::vec3 rot = GetOwner()->GetRotation();
 		float angle = mRotateSpeed * deltaTime;
 

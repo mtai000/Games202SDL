@@ -13,7 +13,7 @@ LightComponent::LightComponent(Actor* owner)
 	, mIntensity(glm::vec3(10.f))
 	, mSpeed(1.f)
 {
-	SetTargetAndUp(glm::vec3(0.f, 0.f, 0.f), MyMath::AxisY);
+	SetTargetAndUp(glm::vec3(0.f, 0.f, 0.f), mms::AxisY);
 
 	GetOwner()->GetGame()->GetRenderer()->AddLightComp(this);
 }
@@ -34,7 +34,8 @@ void LightComponent::SetTargetAndUp(const glm::vec3& _target, const glm::vec3& _
 
 glm::mat4 LightComponent::GetMVP(Actor* targetObject)
 {
-	glm::mat4  lightMVP = targetObject->GetWorldTransform();
+	targetObject->ComputeWorldTransform();
+	glm::mat4 lightMVP = targetObject->GetWorldTransform();
 	glm::mat4 view = glm::lookAt(GetOwner()->GetPosition(), mTarget, mUp);
 	glm::mat4 proj = glm::ortho(-200.f, 400.f, -200.f, 400.f, 0.1f, 1000.f);
 	lightMVP = proj * view * lightMVP;
@@ -45,6 +46,6 @@ glm::mat4 LightComponent::GetMVP(Actor* targetObject)
 
 void LightComponent::Update(float deltaTime)
 {
-	auto rotateMatrix = glm::rotate(glm::mat4(1.f), mSpeed * deltaTime, MyMath::AxisY);
+	auto rotateMatrix = glm::rotate(glm::mat4(1.f), mSpeed * deltaTime, mms::AxisY);
 	GetOwner()->SetPosition(rotateMatrix * glm::vec4(GetOwner()->GetPosition(), 1.f));
 }

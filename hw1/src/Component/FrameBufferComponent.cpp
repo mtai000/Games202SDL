@@ -1,9 +1,8 @@
+#include "head.h"
 #include "FrameBufferComponent.h"
 #include "Core/Actor.h"
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
-#include "SDL2/SDL.h"
-
 #include "Core/Game.h"
 #include "Core/Renderer.h"
 #include "Core/Actor.h"
@@ -22,35 +21,35 @@ FrameBufferComponent::FrameBufferComponent(Actor* owner, unsigned int width, uns
 	mColorTexture = color_texture;
 	glBindTexture(GL_TEXTURE_2D, color_texture);
 
-	//colorÎÆÀí
+	//colorï¿½ï¿½ï¿½ï¿½
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	//ÎÆÀí»·ÈÆ·½Ê½
-	//GL_REPEAT 	¶ÔÎÆÀíµÄÄ¬ÈÏÐÐÎª¡£ÖØ¸´ÎÆÀíÍ¼Ïñ¡£
-	//GL_MIRRORED_REPEAT 	ºÍGL_REPEATÒ»Ñù£¬µ«Ã¿´ÎÖØ¸´Í¼Æ¬ÊÇ¾µÏñ·ÅÖÃµÄ¡£
-	//GL_CLAMP_TO_EDGE 	ÎÆÀí×ø±ê»á±»Ô¼ÊøÔÚ0µ½1Ö®¼ä£¬³¬³öµÄ²¿·Ö»áÖØ¸´ÎÆÀí×ø±êµÄ±ßÔµ£¬²úÉúÒ»ÖÖ±ßÔµ±»À­ÉìµÄÐ§¹û¡£
-	//GL_CLAMP_TO_BORDER 	³¬³öµÄ×ø±êÎªÓÃ»§Ö¸¶¨µÄ±ßÔµÑÕÉ«¡£
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ·ï¿½Ê½
+	//GL_REPEAT 	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¬ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½Ø¸ï¿½ï¿½ï¿½ï¿½ï¿½Í¼ï¿½ï¿½
+	//GL_MIRRORED_REPEAT 	ï¿½ï¿½GL_REPEATÒ»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ã¿ï¿½ï¿½ï¿½Ø¸ï¿½Í¼Æ¬ï¿½Ç¾ï¿½ï¿½ï¿½ï¿½ï¿½ÃµÄ¡ï¿½
+	//GL_CLAMP_TO_EDGE 	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½á±»Ô¼ï¿½ï¿½ï¿½ï¿½0ï¿½ï¿½1Ö®ï¿½ä£¬ï¿½ï¿½ï¿½ï¿½ï¿½Ä²ï¿½ï¿½Ö»ï¿½ï¿½Ø¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½Ôµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½Ö±ï¿½Ôµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½
+	//GL_CLAMP_TO_BORDER 	ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½Ã»ï¿½Ö¸ï¿½ï¿½ï¿½Ä±ï¿½Ôµï¿½ï¿½É«ï¿½ï¿½
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color_texture, 0);
-	//Èç¹ûÎÒÃÇÑ¡ÔñGL_CLAMP_TO_BORDERÑ¡Ïî£¬ÐèÒªÖ¸¶¨Ò»¸ö±ßÔµµÄÑÕÉ«
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½GL_CLAMP_TO_BORDERÑ¡ï¿½î£¬ï¿½ï¿½ÒªÖ¸ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ôµï¿½ï¿½ï¿½ï¿½É«
 	//float borderColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
 	//glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
-	// Éî¶ÈÎÆÀí
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	unsigned int depth_texture;
 	glGenTextures(1, &depth_texture);
 	mDepthTexture = depth_texture;
 	glBindTexture(GL_TEXTURE_2D, depth_texture);
-	// ¸øÉî¶ÈÎÆÀí¶ÔÏó¸³Öµ
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Öµ
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-	//ÎÆÀí»·ÈÆ·½Ê½
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ·ï¿½Ê½
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
