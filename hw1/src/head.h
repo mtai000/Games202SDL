@@ -20,8 +20,12 @@ namespace mms
 	{
 		return (fabs(val) <= epsilon);
 	}
-
+	#define ASSERT(cond,msg) 											\
+		if(!(cond)){													\
+	 	fprintf(stderr, "Assertion failed: %s, message: %s,file: %s, line: %d\n", #cond, msg, __FILE__, __LINE__);		\
+		abort();}														\
 
 	constexpr glm::vec3 AxisY = glm::vec3(0.f, 1.f, 0.f);
 	constexpr glm::vec3 AxisX = glm::vec3(1.f, 0.f, 0.f);
+	
 }

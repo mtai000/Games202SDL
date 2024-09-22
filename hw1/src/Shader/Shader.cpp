@@ -1,4 +1,5 @@
 #include "Shader.h"
+#include <cstring>
 
 Shader::Shader()
 	: mVertex(0)

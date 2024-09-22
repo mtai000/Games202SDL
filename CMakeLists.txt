@@ -4,7 +4,7 @@ project ("Games202")
 
 set(LOCAL_3RDPARTY ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty)
 set(CMAKE_MODULE_PATH ${LOCAL_3RDPARTY}/CMake)
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:CONSOLE /NODEFAULTLIB:library")
+# set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:CONSOLE /NODEFAULTLIB:library")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -20,12 +20,16 @@ else()
   set(MODULE_TARGET_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
 endif()
 
-include(${LOCAL_3RDPARTY}/cmake/CopyFiles.cmake)
+include(${LOCAL_3RDPARTY}/CMake/CopyFiles.cmake)
 find_package(OpenGL REQUIRED)
 find_package(GLFW REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(GLM REQUIRED)
-include(3rdparty/SDL2/cmake/sdl2-config.cmake)
+if(WIN32)
+  include(3rdparty/SDL2/cmake/sdl2-config.cmake)
+else()
+  find_package(SDL2 REQUIRED)
+endif()
 
 message(${SDL2_INCLUDE_DIRS})
 include_directories(

@@ -4,7 +4,7 @@
 #include "Core/Renderer.h"
 #include "head.h"
 #include "Component/MoveComponent.h"
-#include <glm/gtx/vector_angle.hpp>;
+#include <glm/gtx/vector_angle.hpp>
 #include <glm/gtc/constants.hpp>
 
 CameraActor::CameraActor(Game* _game)

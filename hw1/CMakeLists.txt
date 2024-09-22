@@ -1,7 +1,8 @@
 ﻿cmake_minimum_required(VERSION 3.17)
 
 project("hw1")
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:CONSOLE /NODEFAULTLIB:library")
+# set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:CONSOLE /NODEFAULTLIB:library")
+
 include_directories(src)
 
 file(GLOB actor_src src/Actor/*.cpp src/Actor/*.h)
@@ -32,4 +33,6 @@ target_link_libraries(${PROJECT_NAME}
 
 CopyShaders(${PROJECT_NAME})
 CopyAssets(${PROJECT_NAME})
+if(WIN32)
 CopyDLL(${PROJECT_NAME})
+endif()

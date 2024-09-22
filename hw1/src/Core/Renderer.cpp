@@ -1,6 +1,8 @@
 #include "Renderer.h"
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+#include <cassert>
+#include <cstring>
 #include "Game.h"
 
 #include "Shader/Shader.h"
@@ -414,7 +416,7 @@ bool Renderer::LoadObj(const char* filePath) {
 				LoadMaterial((folder + "/").c_str(), mtllib);
 			}
 			else {
-				assert(0, "not found the material file!");
+				ASSERT(0,"not found the material file!");
 			}
 		}
 		else if (strcmp(lineHeader, "usemtl") == 0) {
@@ -568,6 +570,7 @@ bool Renderer::LoadMaterial(const char* folder, const char* fileName) {
 			mTextures.emplace(_m->mMap_Kd, _t);
 		}
 	}
+	return true;
 }
 
 void Renderer::PushbackMesh(
@@ -584,13 +587,13 @@ void Renderer::PushbackMesh(
 	//tmp_mesh.MeshMaterialName = findMaterial(mtlname);
 	for (unsigned int i = 0; i < _iVertexIndices.size(); i++) {
 		SVertex _tmp_v;
-		assert(_iVertexIndices[i] - 1 < _iv.size(), "vertex indices out of array index");
+		ASSERT(_iVertexIndices[i] - 1 < _iv.size(), "vertex indices out of array index");
 		_tmp_v.position = _iv[_iVertexIndices[i] - 1];
 
-		assert(_iUVIndices[i] - 1 < _it.size(), "UV indices out of array index");
+		ASSERT(_iUVIndices[i] - 1 < _it.size(), "UV indices out of array index");
 		_tmp_v.texCoord = _it[_iUVIndices[i] - 1];
 
-		assert(_iNormalIndices[i] - 1 < _in.size(), "normal indices out of array index");
+		ASSERT(_iNormalIndices[i] - 1 < _in.size(), "normal indices out of array index");
 		_tmp_v.normal = _in[_iNormalIndices[i] - 1];
 
 		_sv.emplace_back(_tmp_v);

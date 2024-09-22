@@ -1,7 +1,6 @@
 #version 430
 
 // Phong related variables
-
 uniform vec3 uKd;
 uniform vec3 uKs;
 uniform vec3 uLightPos;
@@ -99,7 +98,7 @@ float findBlocker( sampler2D shadowMap,  vec2 uv, float zReceiver ) {
   for(int i = 0; i < BLOCKER_SEARCH_NUM_SAMPLES;i++)
   {
     vec2 randCoords = uv + SEARCHRADIUS * poissonDisk[i];
-    float depthOnShadownMap = unpack(texture2D(shadowMap,randCoords));
+    float depthOnShadownMap = unpack(texture(shadowMap,randCoords));
     if(zReceiver > depthOnShadownMap){
       blockDepth += depthOnShadownMap;
       cnt++;
@@ -112,7 +111,7 @@ float findBlocker( sampler2D shadowMap,  vec2 uv, float zReceiver ) {
 }
 
 float useShadowMap(sampler2D shadowMap, vec4 shadowCoord){
-  vec4 depthRGBA = texture2D(shadowMap,shadowCoord.xy);
+  vec4 depthRGBA = texture(shadowMap,shadowCoord.xy);
   float depthUnpack = unpack(depthRGBA);
   float curDepth = shadowCoord.z;
 
@@ -126,7 +125,7 @@ float PCF(sampler2D shadowMap, vec4 coords ,float filterSize) {
   for(int i = 0 ; i < PCF_NUM_SAMPLES; i++)
   {
     //vec4 randCoords = vec4(coords.xy + filterSize * poissonDisk[i] ,coords.zw);
-    //float depth = unpack( texture2D(shadowMap ,randCoords.xy));
+    //float depth = unpack( texture(shadowMap ,randCoords.xy));
     //float vis = curDepth - getBIAS() <= depth ? 1.0 : 0.0;
     //sum += vis;
     vec4  rand = vec4(coords.xy + SEARCHRADIUS * poissonDisk[i] ,coords.zw);
@@ -155,7 +154,7 @@ vec3 blinnPhong() {
   vec3 color ;
   if(uTextureSample == 1)
   {
-    color= texture2D(uSampler, vTextureCoord).rgb;
+    color= texture(uSampler, vTextureCoord).rgb;
     color = pow(color, vec3(2.2));
   }
   else

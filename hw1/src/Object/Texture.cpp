@@ -1,7 +1,6 @@
-#pragma once
 #include "head.h"
 #include <string>
-#include "texture.h"
+#include "Texture.h"
 #include <GL/glew.h>
 #include <vector>
 #include "stb_image.h"
