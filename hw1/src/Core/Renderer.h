@@ -29,6 +29,7 @@ public:
 	void RemoveFrameBufferComp(class FrameBufferComponent* fbo);
 
 	void AddLightComp(class LightComponent* light);
+	std::vector<class LightComponent*> GetLightComps();
 	void RemoveLightComp(class LightComponent* light);
 
 	float GetScreenWidth() const { return mScreenWidth; }
@@ -46,8 +47,7 @@ public:
 	bool LoadMaterial(const char* folder, const char* fileName);
 
 	class CameraActor* GetMainCamera() { return mMainCameraActor; }
-
-
+	class CGUI* GetGui() const;
 private:
 	bool LoadShaders();
 
@@ -55,7 +55,8 @@ private:
 
 	SDL_Window* mWindow;
 	SDL_GLContext mContext;
-
+	class CGUI* mGui;
+	
 	class Shader* mTestShader;
 	class Shader* mLightShader;
 	class Shader* mPhongShader;
@@ -84,6 +85,5 @@ private:
 
 	//Test part
 	void CreateTestPlane();
-	class VertexArray* mTestVA;
 	void TestRendering();
 };

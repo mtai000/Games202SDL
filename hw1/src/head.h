@@ -4,10 +4,15 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
 
+#include <imgui.h>
+#include <backends/imgui_impl_sdl2.h>
+#include <backends/imgui_impl_opengl3.h>
+
 #include <math.h>
 #include <limits>
 #include <string>
-
+#include <vector>
+#include <GL/glew.h>
 namespace mms
 {
 	const std::string assets_path = "assets/hw1/";

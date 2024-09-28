@@ -18,7 +18,8 @@ public:
 	void Update(float deltaTime);
 
 	void SetSpeed(float _v) { mSpeed = _v; }
-
+	bool& IsValid() {return bValid;}
+	void SetValid(bool v) { bValid = v;}
 private:
 	glm::vec3 mColor;
 	glm::vec3 mIntensity;
@@ -26,4 +27,5 @@ private:
 	glm::vec3 mTarget;
 	glm::vec3 mUp;
 	float mSpeed;
+	bool bValid;
 };

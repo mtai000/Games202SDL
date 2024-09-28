@@ -24,6 +24,7 @@ public:
 	void RemoveActor(class Actor* actor);
 
 	class Renderer* GetRenderer() { return mRenderer; }
+	unsigned int GetTicks() {return mTicksCount - mTicksCountPrev;}
 private:
 	GameState mGameState;
 	class Renderer* mRenderer;
@@ -39,6 +40,7 @@ private:
 	std::vector<class Actor*> mPendingActors;
 
 	unsigned int mTicksCount;
+	unsigned int mTicksCountPrev;
 	bool mIsRunning;
 	bool mUpdatingActors;
 };

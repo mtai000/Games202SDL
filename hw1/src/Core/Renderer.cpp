@@ -1,9 +1,9 @@
 #include "Renderer.h"
-#include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <cassert>
 #include <cstring>
 #include "Game.h"
+#include "UI/Gui.h"
 
 #include "Shader/Shader.h"
 #include <iostream>
@@ -27,6 +27,7 @@ Renderer::Renderer(Game* game)
 	, mPhongShader(NULL)
 	, mTestShader(NULL)
 	, mShadowShader(NULL)
+	, mGui(NULL)
 {
 
 }
@@ -83,25 +84,30 @@ bool Renderer::Init(unsigned int width, unsigned int height)
 	CreateTestPlane();
 #endif
 	mMainCameraActor = new CameraActor(mGame);
-
+	mGui = new CGUI(this,mWindow,mContext);
 	return true;
 }
 
 void Renderer::Shutdown()
 {
-	mPhongShader->Unload();
-	delete mPhongShader;
+	if(mPhongShader){
+		mPhongShader->Unload();
+		delete mPhongShader;
+	}
+	if(mLightShader){
+		mLightShader->Unload();
+		delete mLightShader;
+	}
 
-	mLightShader->Unload();
-	delete mLightShader;
-
-	mShadowShader->Unload();
-	delete mShadowShader;
-
-	mTestShader->Unload();
-	delete mTestShader;
-
-	delete mTestVA;
+	if(mShadowShader){
+		mShadowShader->Unload();
+		delete mShadowShader;
+	}
+	if(mTestShader){
+		mTestShader->Unload();
+		delete mTestShader;
+	}
+	if(mGui) delete mGui;
 
 	printf("Shutdown Renderer\n");
 	SDL_GL_DeleteContext(mContext);
@@ -213,29 +219,35 @@ void Renderer::RemoveFrameBufferComp(FrameBufferComponent* fbo)
 void Renderer::AddLightComp(LightComponent* light) {
 	mLightComps.emplace_back(light);
 }
-void Renderer::RemoveLightComp(LightComponent* light) {
-	auto iter = std::find(mLightComps.begin(), mLightComps.end(), light);
+std::vector<class LightComponent *> Renderer::GetLightComps()
+{
+    return mLightComps;
+}
+void Renderer::RemoveLightComp(LightComponent *light)
+{
+    auto iter = std::find(mLightComps.begin(), mLightComps.end(), light);
 	mLightComps.erase(iter);
 }
 
 void Renderer::Draw()
 {
-
-
 #ifdef TEST
 	TestRendering();
 #endif
 	//LightRendering();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH_TEST);
+	// LightRendering();
+
 	glViewport(0.0, 0.0, 2048, 2048);
 	ShadowRendering();
 
 	glViewport(0, 0, mScreenWidth, mScreenHeight);
-	glClearColor(0.f, 0.f, 0.f, 1.0f);
+	glClearColor(0.1f, 0.15f, 0.2f, 1.0f);
 	PhongRendering();
-
-
+	
+	mGui->NewFrame();
+	mGui->Draw();
 	SDL_GL_SwapWindow(mWindow);
 }
 
@@ -246,11 +258,9 @@ void Renderer::LightRendering()
 	mLightShader->SetMat4("uProjectionMatrix", mMainCameraActor->GetProjMatrix());
 	mLightShader->SetVec3("uLightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 
-	for (auto m : mMeshComps) {
-		if (m->GetVisible())
-		{
-			m->Draw(mLightShader);
-		}
+	for(int i = 0; i < mLightComps.size();i++){
+		if(!mLightComps[i]->IsValid()) continue;
+
 	}
 }
 
@@ -259,9 +269,11 @@ void Renderer::ShadowRendering()
 	mShadowShader->SetActive();
 	mShadowShader->SetMat4("uViewMatrix", mMainCameraActor->GetViewMatrix());
 	mShadowShader->SetMat4("uProjectionMatrix", mMainCameraActor->GetProjMatrix());
-
 	for (int i = 0; i < mLightComps.size(); i++)
 	{
+		if(!mLightComps[i]->IsValid()){
+			continue;
+		}
 		mFrameBufferComps[i]->Active();
 		glClearColor(1.f, 1.f, 1.f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -280,14 +292,24 @@ void Renderer::PhongRendering()
 	mPhongShader->SetActive();
 	mPhongShader->SetMat4("uViewMatrix", mMainCameraActor->GetViewMatrix());
 	mPhongShader->SetMat4("uProjectionMatrix", mMainCameraActor->GetProjMatrix());
+	mPhongShader->SetInt("iShadowType",GetGui()->GetShadowType());
 
-	for (int i = 0; i < mLightComps.size(); i++)
+	for(auto light : mLightComps){
+		if(!light->IsValid()) continue;
+	}
+
+	for (int i = 0,cnt = 0; i < mLightComps.size(); i++)
 	{
-		if (i != 0)
+		if(!mLightComps[i]->IsValid()) continue;
+		if (cnt != 0)
 		{
 			glDepthFunc(GL_LEQUAL);
 			glEnable(GL_BLEND);
 			glBlendFunc(GL_ONE, GL_ONE);
+		}
+		else
+		{
+			cnt++;
 		}
 
 		for (auto m : mMeshComps) {
@@ -303,6 +325,7 @@ void Renderer::PhongRendering()
 
 				mPhongShader->SetVec3("uCameraPos", mMainCameraActor->GetPosition());
 				mPhongShader->SetVec3("uLightIntensity", mLightComps[i]->GetIntensity());
+				mPhongShader->SetFloat("uGamma",mGui->GetGamma());
 
 				if (m->GetTexture())
 				{
@@ -341,8 +364,13 @@ void Renderer::TestRendering() {
 
 }
 
+CGUI* Renderer::GetGui() const
+{
+	return mGui;
+}
 
-bool Renderer::LoadShaders() {
+bool Renderer::LoadShaders()
+{
 #ifdef  TEST
 	mTestShader = new Shader();
 	if (!mTestShader->Load("assets/shader/test.vert", "assets/shader/test.frag"))
@@ -609,26 +637,4 @@ void Renderer::PushbackMesh(
 	Mesh* m = new Mesh(va);
 	m->SetMeshName(name);
 	AddMesh(m);
-}
-
-
-
-void Renderer::CreateTestPlane()
-{
-	float vertices[] = {
-	-0.5f, 0.5f, 0.f, 0.f, 0.f, 0.0f, 0.f, 0.f, // top left
-	0.5f, 0.5f, 0.f, 0.f, 0.f, 0.0f, 1.f, 0.f, // top right
-	0.5f,-0.5f, 0.f, 0.f, 0.f, 0.0f, 1.f, 1.f, // bottom right
-	-0.5f,-0.5f, 0.f, 0.f, 0.f, 0.0f, 0.f, 1.f  // bottom left
-	};
-
-	SVertex s;
-	auto a = SVertex();
-
-	unsigned int indices[] = {
-		0, 1, 2,
-		2, 3, 0
-	};
-
-	mTestVA = new VertexArray(vertices, 4, indices, 6);
 }

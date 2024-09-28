@@ -12,7 +12,6 @@ FloorActor::FloorActor(Game* _game)
 {
 	const char* meshname = "Plane";
 	MeshComponent* mc = new MeshComponent(this);
-
 	mc->SetMesh(_game->GetRenderer()->GetMesh(meshname));
 	if (!mc->GetMesh())
 		SDL_Log("Can not load mesh: %s", "Plane");

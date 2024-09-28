@@ -14,7 +14,6 @@ LightComponent::LightComponent(Actor* owner)
 	, mSpeed(1.f)
 {
 	SetTargetAndUp(glm::vec3(0.f, 0.f, 0.f), mms::AxisY);
-
 	GetOwner()->GetGame()->GetRenderer()->AddLightComp(this);
 }
 

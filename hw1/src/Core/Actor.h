@@ -32,7 +32,7 @@ public:
 	void SetScale(glm::vec3 scale) { mScale = scale;  mRecomputeWorldTransform = true; }
 
 
-	const glm::vec3& GetPosition() const { return mPosition; }
+	glm::vec3& GetPosition() { return mPosition; }
 	void SetPosition(const glm::vec3& position) {
 		mPosition = position;
 		mRecomputeWorldTransform = true;
@@ -60,7 +60,7 @@ private:
 
 
 	glm::vec3 mPosition;
-	glm::vec3 mRotation;  //Å·À­½Ç
+	glm::vec3 mRotation;  //Å·ï¿½ï¿½ï¿½ï¿½
 	glm::mat4 mWorldTransform;
 
 	glm::vec3 mScale;

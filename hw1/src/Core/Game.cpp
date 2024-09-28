@@ -3,7 +3,9 @@
 #include "Renderer.h"
 #include "Actor/FloorActor.h"
 #include "Actor/CameraActor.h"
-#include <Actor/MarryActor.h>
+#include "Actor/MarryActor.h"
+#include "UI/Gui.h"
+#include "Component/LightComponent.h"
 
 #include <algorithm>
 #include <GL/glew.h>
@@ -46,8 +48,9 @@ void Game::RunLoop()
 	while (mGameState != EQuit)
 	{
 		ProcessInput();
-		UpdateGame();
+		UpdateGame();	
 		GenerateOutput();
+		mTicksCountPrev = mTicksCount;
 	}
 }
 
@@ -132,19 +135,30 @@ void Game::LoadData()
 	a->SetPosition(glm::vec3(5.f, 0.f, 0.f));
 	a->SetScale(glm::vec3(5.f, 5.f, 5.f));
 
-
 	LightActor* l = new LightActor(this, glm::vec3(30.f, 40.f, 0.f));
 	l->SetRotateSpeed(glm::radians(10.f));
 	l->InitFrameBuffer(2048, 2048);
+	l->GetLightComponent()->SetIntensity(glm::vec3(40.f));
 
 	l = new LightActor(this, glm::vec3(40.f, 35.f, 0.f));
 	l->SetRotateSpeed(glm::radians(20.f));
 	l->InitFrameBuffer(2048, 2048);
+	l->GetLightComponent()->SetIntensity(glm::vec3(60.f));
 
 	l = new LightActor(this, glm::vec3(50.f, 30.f, 0.f));
 	l->SetRotateSpeed(glm::radians(30.f));
 	l->InitFrameBuffer(2048, 2048);
+	l->GetLightComponent()->SetIntensity(glm::vec3(30.f));
+	
+	l = new LightActor(this, glm::vec3(60.f, 45.f, 0.f));
+	l->SetRotateSpeed(glm::radians(-10.f));
+	l->InitFrameBuffer(2048, 2048);
+	l->GetLightComponent()->SetIntensity(glm::vec3(45.f));
 
+	l = new LightActor(this, glm::vec3(60.f, 25.f, 0.f));
+	l->SetRotateSpeed(glm::radians(-20.f));
+	l->InitFrameBuffer(2048, 2048);
+	l->GetLightComponent()->SetIntensity(glm::vec3(30.f));
 
 	a = nullptr;
 	delete a;
@@ -171,6 +185,7 @@ void Game::ProcessInput()
 	GetRenderer()->GetMainCamera()->Forward(0);
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
+		mRenderer->GetGui()->ProcessEvent(event);
 		switch (event.type) {
 		case SDL_QUIT:
 			mGameState = EQuit;

@@ -6,10 +6,12 @@ uniform vec3 uKs;
 uniform vec3 uLightPos;
 uniform vec3 uCameraPos;
 uniform vec3 uLightIntensity;
+uniform float uGamma;
 
 uniform sampler2D uSampler;
 uniform sampler2D uShadowMap;
 uniform int uTextureSample;
+uniform int iShadowType;
 
 in vec2 vTextureCoord;
 in vec3 vFragPos;
@@ -18,7 +20,6 @@ in vec3 vNormal;
 // Shadow map related variables
 #define NUM_SAMPLES 50
 #define BLOCKER_SEARCH_NUM_SAMPLES NUM_SAMPLES
-#define PCF_NUM_SAMPLES NUM_SAMPLES
 #define NUM_RINGS 10
 
 #define EPS 1e-3
@@ -90,6 +91,7 @@ void uniformDiskSamples( const in vec2 randomSeed ) {
 }
 
 #define SEARCHRADIUS 0.0015
+
 float findBlocker( sampler2D shadowMap,  vec2 uv, float zReceiver ) {
   // vPositionFromLight.z
   poissonDiskSamples(uv);
@@ -122,17 +124,17 @@ float PCF(sampler2D shadowMap, vec4 coords ,float filterSize) {
   float curDepth = coords.z;
   float sum = 0.0;
   poissonDiskSamples(coords.xy);
-  for(int i = 0 ; i < PCF_NUM_SAMPLES; i++)
+  for(int i = 0 ; i < NUM_SAMPLES; i++)
   {
     //vec4 randCoords = vec4(coords.xy + filterSize * poissonDisk[i] ,coords.zw);
     //float depth = unpack( texture(shadowMap ,randCoords.xy));
     //float vis = curDepth - getBIAS() <= depth ? 1.0 : 0.0;
     //sum += vis;
-    vec4  rand = vec4(coords.xy + SEARCHRADIUS * poissonDisk[i] ,coords.zw);
+    vec4  rand = vec4(coords.xy + filterSize * poissonDisk[i] ,coords.zw);
     sum += useShadowMap(shadowMap, rand);
   }
  
-  return sum / float(PCF_NUM_SAMPLES);
+  return sum / float(NUM_SAMPLES);
 }
 
 float PCSS(sampler2D shadowMap, vec4 coords){
@@ -155,20 +157,19 @@ vec3 blinnPhong() {
   if(uTextureSample == 1)
   {
     color= texture(uSampler, vTextureCoord).rgb;
-    color = pow(color, vec3(2.2));
+    color = pow(color, vec3(5));
   }
   else
   {
     color = uKd;
   }
-  vec3 ambient = 0.05 * color;
 
   vec3 lightDir = normalize(uLightPos);
   vec3 normal = normalize(vNormal);
   float diff = max(dot(lightDir, normal), 0.0);
-  vec3 light_atten_coff =
-      uLightIntensity / pow(length(uLightPos - vFragPos), 2.0);
+  vec3 light_atten_coff = uLightIntensity / pow(length(uLightPos - vFragPos), 2.0);
   vec3 diffuse = diff * light_atten_coff * color;
+  vec3 ambient = 0.05 * color * light_atten_coff;
 
   vec3 viewDir = normalize(uCameraPos - vFragPos);
   vec3 halfDir = normalize((lightDir + viewDir));
@@ -176,7 +177,7 @@ vec3 blinnPhong() {
   vec3 specular = uKs * light_atten_coff * spec;
 
   vec3 radiance = (ambient + diffuse + specular);
-  vec3 phongColor = pow(radiance, vec3(1.0 / 2.2));
+  vec3 phongColor = pow(radiance, vec3(uGamma));
   return phongColor;
 }
 
@@ -185,9 +186,12 @@ void main(void) {
   float visibility;
   vec3 shadowCoord = vPositionFromLight.xyz / vPositionFromLight.w * 0.5 + 0.5;
   //outColor = vec4(vPositionFromLight.xy,1,1);
-  //visibility = useShadowMap(uShadowMap, vec4(shadowCoord, 1.0));
-  //visibility = PCF(uShadowMap, vec4(shadowCoord, 1.0), 0.0005);
-  visibility = PCSS(uShadowMap, vec4(shadowCoord, 1.0));
+  if(iShadowType == 1) 
+    visibility = useShadowMap(uShadowMap, vec4(shadowCoord, 1.0));
+  if(iShadowType == 2)
+    visibility = PCF(uShadowMap, vec4(shadowCoord, 1.0), 0.0005);
+  else if(iShadowType == 4)
+    visibility = PCSS(uShadowMap, vec4(shadowCoord, 1.0));
 
   vec3 phongColor = blinnPhong();
 
