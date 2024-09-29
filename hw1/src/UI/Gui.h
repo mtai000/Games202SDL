@@ -8,7 +8,7 @@ public:
     void NewFrame();
     void ProcessEvent(const SDL_Event &event);
     void Quit();
-    void CGUI::Draw();
+    void Draw();
     int GetShadowType() const {return mBitShadow;}
     float GetGamma() const {return mGamma;}
 private:

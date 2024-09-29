@@ -24,7 +24,7 @@ include(cmake/copy.cmake)
 find_package(OpenGL REQUIRED)
 find_package(glfw3 CONFIG REQUIRED)
 find_package(GLEW REQUIRED)
-find_package(GLM REQUIRED)
+find_package(glm REQUIRED)
 find_package(SDL2 REQUIRED)
 set(IMGUI_DIR ${CMAKE_SOURCE_DIR}/deps/imgui)
 

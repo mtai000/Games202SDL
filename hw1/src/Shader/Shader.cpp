@@ -32,9 +32,9 @@ bool Shader::Load(const std::string& vertex, const std::string& fragment) {
 
 void Shader::Unload() {
 	if (!this) return;
-	glDeleteProgram(mProgram);
-	glDeleteShader(mVertex);
-	glDeleteShader(mFragment);
+	if(mProgram) glDeleteProgram(mProgram);
+	if(mVertex) glDeleteShader(mVertex);
+	if(mFragment) glDeleteShader(mFragment);
 }
 
 bool Shader::CompileShader(const std::string& filename,

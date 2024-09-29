@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 #include <GL/glew.h>
+#include <algorithm>
 namespace mms
 {
 	const std::string assets_path = "assets/hw1/";
